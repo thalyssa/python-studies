@@ -4,9 +4,14 @@ from nltk.classify import accuracy
 from nltk.classify import apply_features
 import random
 
-
+''' PRIMEIRA VERSÃO
 def gender_features(word):
     return {'last letter': word[-1], 'length': len(word), 'first letter': word[0]}
+'''
+
+
+def gender_features(word):
+    return {'suffix1': word[-1:], 'suffix2': word[-2:]}
 
 
 # Separa os nomes importados dos arquivos em masculinos e femininos, reorganizando a lista de forma aleatória depois.
@@ -35,12 +40,11 @@ print(accuracy(classifier, test_set))
     test_set = apply_features(gender_features, labeled_names[:500])
 '''
 
-
 # ANÁLISE DE ERRO
 
-train_names = labeled_names[1500:] # Dados de treinamento
-devtest_names = labeled_names[500:1500] # Dados para performar análise de erro
-test_names = labeled_names[:500] # Array contendo os dados de teste do modelo
+train_names = labeled_names[1500:]  # Dados de treinamento
+devtest_names = labeled_names[500:1500]  # Dados para performar análise de erro
+test_names = labeled_names[:500]  # Array contendo os dados de teste do modelo
 
 train_set = [(gender_features(n), gender) for (n, gender) in train_names]
 devtest_set = [(gender_features(n), gender) for (n, gender) in devtest_names]
@@ -50,3 +54,17 @@ classifier = NaiveBayesClassifier.train(train_set)
 
 print('\nAnálise de erro')
 print(accuracy(classifier, devtest_set))
+print()
+
+# Lista de erros feitos pelo classificador na previsão de gêneros
+errors = []
+for (name, tag) in devtest_names:
+    guess = classifier.classify(gender_features(name))
+    if guess != tag:
+        errors.append((tag, guess, name))
+
+# Printa a lista de erros
+'''
+for (tag, guess, name) in sorted(errors):
+    print('Correct: {:<8} Guess: {:<8s} Name: {:<30}'. format(tag, guess, name))
+'''
